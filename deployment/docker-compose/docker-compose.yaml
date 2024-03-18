@@ -1,0 +1,30 @@
+version: '3'
+services:
+  demo:
+    env_file:
+      - .env
+    environment:
+      - NATS_URL=nats://demo-nats:4222
+      - DATABASE_URL=mongodb://demo-mongodb:27017
+      - CACHE_URL=redis://demo-redis:6379
+    container_name: bff
+    image: ${REGISTRY}/demo:latest
+    labels:
+      - "com.centurylinklabs.watchtower.enable=true"
+    ports:
+      - "8081:8081"
+    restart: always
+    networks:
+      - demo-network
+## Auto update container to latest image
+#  watchtower:
+#    image: containrrr/watchtower
+#    volumes:
+#      - /root/.docker/config.json:/config.json
+#      - /var/run/docker.sock:/var/run/docker.sock
+#    command:
+#      --interval 30
+#      --cleanup
+#      --label-enable
+networks:
+  demo-network:
