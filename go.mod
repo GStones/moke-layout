@@ -1,6 +1,6 @@
 module github.com/gstones/moke-layout
 
-go 1.20
+go 1.21
 
 require (
 	github.com/abiosoft/ishell v2.0.0+incompatible
