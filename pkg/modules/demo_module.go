@@ -12,6 +12,7 @@ import (
 var GrpcModule = fx.Module("grpcService",
 	dfx.SqliteDriverModule,
 	dfx.SettingsModule,
+	dfx.AuthModule,
 	demo.GrpcModule,
 )
 
@@ -20,6 +21,7 @@ var GrpcModule = fx.Module("grpcService",
 var HttpModule = fx.Module("httpService",
 	dfx.SettingsModule,
 	dfx.SqliteDriverModule,
+	dfx.AuthModule,
 	demo.GrpcModule,
 	demo.GatewayModule,
 )
@@ -35,6 +37,7 @@ var TcpModule = fx.Module("tcpService",
 // AllModule  all service module
 // can inject it to any fxmain.Main(), if you want to start demo all type services
 var AllModule = fx.Module("allService",
+	dfx.AuthModule,
 	dfx.SettingsModule,
 	dfx.SqliteDriverModule,
 	demo.GrpcModule,
