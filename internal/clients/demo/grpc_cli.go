@@ -18,7 +18,7 @@ type DemoGrpc struct {
 	cmd    *ishell.Cmd
 }
 
-func NewDemoGrpc(conn *grpc.ClientConn) *DemoGrpc {
+func NewDemoGrpcCli(conn *grpc.ClientConn) *DemoGrpc {
 	cmd := &ishell.Cmd{
 		Name:    "demo",
 		Help:    "demo interactive",

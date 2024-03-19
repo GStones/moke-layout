@@ -15,18 +15,18 @@ import (
 	pb "github.com/gstones/moke-layout/api/gen/demo/api"
 )
 
-type DemoZinx struct {
+type DemoTcp struct {
 	conn net.Conn
 	cmd  *ishell.Cmd
 }
 
-func NewZinxDemo(conn net.Conn) *DemoZinx {
+func NewTcpCli(conn net.Conn) *DemoTcp {
 	cmd := &ishell.Cmd{
 		Name:    "demo",
 		Help:    "demo interactive",
 		Aliases: []string{"D"},
 	}
-	p := &DemoZinx{
+	p := &DemoTcp{
 		conn: conn,
 		cmd:  cmd,
 	}
@@ -34,11 +34,11 @@ func NewZinxDemo(conn net.Conn) *DemoZinx {
 	return p
 }
 
-func (dz *DemoZinx) GetCmd() *ishell.Cmd {
+func (dz *DemoTcp) GetCmd() *ishell.Cmd {
 	return dz.cmd
 }
 
-func (dz *DemoZinx) initSubShells() {
+func (dz *DemoTcp) initSubShells() {
 	dz.cmd.AddCmd(&ishell.Cmd{
 		Name:    "hi",
 		Help:    "say hi",
@@ -54,7 +54,7 @@ func (dz *DemoZinx) initSubShells() {
 
 }
 
-func (dz *DemoZinx) sayHi(c *ishell.Context) {
+func (dz *DemoTcp) sayHi(c *ishell.Context) {
 	c.ShowPrompt(false)
 	defer c.ShowPrompt(true)
 
@@ -78,7 +78,7 @@ func (dz *DemoZinx) sayHi(c *ishell.Context) {
 	}
 }
 
-func (dz *DemoZinx) watch(c *ishell.Context) {
+func (dz *DemoTcp) watch(c *ishell.Context) {
 	c.ShowPrompt(false)
 	defer c.ShowPrompt(true)
 
