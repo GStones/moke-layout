@@ -4,14 +4,15 @@ import (
 	"context"
 	"time"
 
-	"github.com/gstones/moke-kit/mq/common"
-	"github.com/gstones/moke-kit/mq/miface"
 	"github.com/redis/go-redis/v9"
 	"go.uber.org/zap"
 	"gorm.io/gorm"
 
-	"github.com/gstones/moke-layout/internal/demo/db_nosql"
-	"github.com/gstones/moke-layout/internal/demo/db_sql"
+	"github.com/gstones/moke-kit/mq/common"
+	"github.com/gstones/moke-kit/mq/miface"
+
+	"github.com/gstones/moke-layout/internal/services/demo/db_nosql"
+	"github.com/gstones/moke-layout/internal/services/demo/db_sql"
 )
 
 type Demo struct {

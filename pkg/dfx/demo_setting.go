@@ -6,6 +6,7 @@ import (
 	"github.com/gstones/moke-kit/utility"
 )
 
+// SettingsParams  you can customize it as your need
 type SettingsParams struct {
 	fx.In
 
@@ -27,6 +28,7 @@ func (g *SettingsResult) LoadFromEnv() (err error) {
 	return
 }
 
+// SettingsModule  config your app settings
 var SettingsModule = fx.Provide(
 	func() (out SettingsResult, err error) {
 		err = out.LoadFromEnv()
