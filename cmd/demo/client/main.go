@@ -5,7 +5,7 @@ import (
 
 	"github.com/spf13/cobra"
 
-	"github.com/gstones/moke-layout/internal/client"
+	"github.com/gstones/moke-layout/internal/clients/demo"
 )
 
 var options struct {
@@ -14,8 +14,8 @@ var options struct {
 }
 
 const (
-	DefaultHost    = "localhost:8081"
-	DefaultTcpHost = "localhost:8888"
+	defaultHost    = "localhost:8081"
+	defaultTcpHost = "localhost:8888"
 )
 
 func main() {
@@ -27,14 +27,14 @@ func main() {
 	rootCmd.PersistentFlags().StringVar(
 		&options.host,
 		"host",
-		DefaultHost,
+		defaultHost,
 		"grpc http service (<host>:<port>)",
 	)
 
 	rootCmd.PersistentFlags().StringVar(
 		&options.tcpHost,
 		"tcp_host",
-		DefaultTcpHost,
+		defaultTcpHost,
 		"tcp service (<host>:<port>)",
 	)
 
@@ -42,14 +42,14 @@ func main() {
 		Use:   "grpc",
 		Short: "Run an interactive grpc client",
 		Run: func(cmd *cobra.Command, args []string) {
-			client.RunGrpc(options.host)
+			demo.RunGrpc(options.host)
 		},
 	}
 	sTcp := &cobra.Command{
 		Use:   "tcp",
 		Short: "Run an interactive tcp client",
 		Run: func(cmd *cobra.Command, args []string) {
-			client.RunTcp(options.tcpHost)
+			demo.RunTcp(options.tcpHost)
 		},
 	}
 	rootCmd.AddCommand(sGrpc, sTcp)

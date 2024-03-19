@@ -8,6 +8,7 @@ import (
 	"github.com/gstones/moke-kit/orm/pkg/ofx"
 )
 
+// SqliteDriverModule  you can customize it as gorm support db adapter
 var SqliteDriverModule = fx.Provide(
 	func(
 		l *zap.Logger,

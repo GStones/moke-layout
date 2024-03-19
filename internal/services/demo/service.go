@@ -18,8 +18,8 @@ import (
 	"github.com/gstones/moke-kit/server/siface"
 
 	pb "github.com/gstones/moke-layout/api/gen/demo/api"
-	"github.com/gstones/moke-layout/internal/demo/db_nosql"
-	"github.com/gstones/moke-layout/internal/demo/handlers"
+	"github.com/gstones/moke-layout/internal/services/demo/db_nosql"
+	"github.com/gstones/moke-layout/internal/services/demo/handlers"
 	"github.com/gstones/moke-layout/pkg/dfx"
 )
 
@@ -204,7 +204,7 @@ var GatewayModule = fx.Provide(
 	},
 )
 
-var ZinxModule = fx.Provide(
+var TcpModule = fx.Provide(
 	func(
 		l *zap.Logger,
 		dProvider ofx.DocumentStoreParams,
