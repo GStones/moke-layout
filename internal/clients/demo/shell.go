@@ -16,7 +16,7 @@ func RunGrpc(url string) {
 	if conn, err := tools.DialInsecure(url); err != nil {
 		slogger.Die(sh, err)
 	} else {
-		demoGrpc := NewDemoGrpc(conn)
+		demoGrpc := NewDemoGrpcCli(conn)
 		sh.AddCmd(demoGrpc.GetCmd())
 
 		sh.Interrupt(func(c *ishell.Context, count int, input string) {
@@ -38,8 +38,8 @@ func RunTcp(url string) {
 	if conn, err := net.Dial("tcp", url); err != nil {
 		slogger.Die(sh, err)
 	} else {
-		demoZinx := NewZinxDemo(conn)
-		sh.AddCmd(demoZinx.GetCmd())
+		demoTcp := NewTcpCli(conn)
+		sh.AddCmd(demoTcp.GetCmd())
 
 		sh.Interrupt(func(c *ishell.Context, count int, input string) {
 			if count >= 2 {
