@@ -6,8 +6,8 @@ require (
 	github.com/abiosoft/ishell v2.0.0+incompatible
 	github.com/grpc-ecosystem/go-grpc-middleware/v2 v2.1.0
 	github.com/grpc-ecosystem/grpc-gateway/v2 v2.19.1
-	github.com/gstones/moke-kit v1.0.0
-	github.com/gstones/zinx v1.2.5
+	github.com/gstones/moke-kit v1.0.1-0.20240523024334-8a0b1e0d264e
+	github.com/gstones/zinx v1.2.7-0.20240522125806-6252e8c9ea5f
 	github.com/redis/go-redis/v9 v9.5.1
 	github.com/spf13/cobra v1.8.0
 	go.uber.org/fx v1.21.1
@@ -21,6 +21,7 @@ require (
 
 require (
 	cloud.google.com/go/compute/metadata v0.2.3 // indirect
+	github.com/ThreeDotsLabs/watermill v1.3.5 // indirect
 	github.com/abiosoft/readline v0.0.0-20180607040430-155bce2042db // indirect
 	github.com/cenkalti/backoff/v3 v3.2.2 // indirect
 	github.com/cenkalti/backoff/v4 v4.3.0 // indirect
@@ -53,6 +54,7 @@ require (
 	github.com/klauspost/compress v1.17.7 // indirect
 	github.com/klauspost/cpuid/v2 v2.2.7 // indirect
 	github.com/klauspost/reedsolomon v1.12.1 // indirect
+	github.com/lithammer/shortuuid/v3 v3.0.7 // indirect
 	github.com/mattn/go-colorable v0.1.13 // indirect
 	github.com/mattn/go-isatty v0.0.20 // indirect
 	github.com/mattn/go-sqlite3 v1.14.22 // indirect
@@ -62,6 +64,7 @@ require (
 	github.com/nats-io/nats.go v1.33.1 // indirect
 	github.com/nats-io/nkeys v0.4.7 // indirect
 	github.com/nats-io/nuid v1.0.1 // indirect
+	github.com/oklog/ulid v1.3.1 // indirect
 	github.com/pkg/errors v0.9.1 // indirect
 	github.com/ryanuber/go-glob v1.0.0 // indirect
 	github.com/soheilhy/cmux v0.1.5 // indirect

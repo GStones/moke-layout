@@ -19,13 +19,13 @@ import (
 
 	pb "github.com/gstones/moke-layout/api/gen/demo/api"
 	"github.com/gstones/moke-layout/internal/services/demo/db_nosql"
-	"github.com/gstones/moke-layout/internal/services/demo/handlers"
+	"github.com/gstones/moke-layout/internal/services/demo/domain"
 	"github.com/gstones/moke-layout/pkg/dfx"
 )
 
 type Service struct {
 	logger      *zap.Logger
-	demoHandler *handlers.Demo
+	demoHandler *domain.Demo
 }
 
 // ---------------- grpc ----------------
@@ -137,7 +137,7 @@ func NewService(
 	gdb *gorm.DB,
 	redis *redis.Client,
 ) (result *Service, err error) {
-	handler := handlers.NewDemo(
+	handler := domain.NewDemo(
 		logger,
 		db_nosql.OpenDatabase(logger, coll),
 		mq,
