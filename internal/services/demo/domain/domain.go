@@ -79,7 +79,7 @@ func (d *Demo) Hi(uid, message string) error {
 func (d *Demo) Watch(ctx context.Context, topic string, callback func(message string) error) error {
 	//nats mq subscribe
 	natsTopic := common.NatsHeader.CreateTopic(topic)
-	_, err := d.mq.Subscribe(
+	if _, err := d.mq.Subscribe(
 		ctx,
 		natsTopic,
 		func(msg miface.Message, err error) common.ConsumptionCode {
@@ -87,13 +87,13 @@ func (d *Demo) Watch(ctx context.Context, topic string, callback func(message st
 				return common.ConsumeNackPersistentFailure
 			}
 			return common.ConsumeAck
-		})
-	if err != nil {
+		}); err != nil {
 		return err
 	}
+
 	//local(channel) mq subscribe
 	localTopic := common.LocalHeader.CreateTopic(topic)
-	_, err = d.mq.Subscribe(
+	if _, err := d.mq.Subscribe(
 		ctx,
 		localTopic,
 		func(msg miface.Message, err error) common.ConsumptionCode {
@@ -101,7 +101,9 @@ func (d *Demo) Watch(ctx context.Context, topic string, callback func(message st
 				return common.ConsumeNackPersistentFailure
 			}
 			return common.ConsumeAck
-		})
+		}); err != nil {
+		return err
+	}
 
 	<-ctx.Done()
 	return nil
