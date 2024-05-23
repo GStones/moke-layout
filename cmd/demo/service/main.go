@@ -13,8 +13,10 @@ func main() {
 		// you can find them from moke-kit https://github.com/GStones/moke-kit
 		// nats message queue
 		mfx.NatsModule,
+		// local(channel) message queue
+		mfx.LocalModule,
 
-		// services
+		// service
 		modules.AllModule,
 	)
 }

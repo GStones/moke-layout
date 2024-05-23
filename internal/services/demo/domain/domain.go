@@ -1,7 +1,8 @@
-package handlers
+package domain
 
 import (
 	"context"
+	"fmt"
 	"time"
 
 	"github.com/redis/go-redis/v9"
@@ -55,20 +56,32 @@ func (d *Demo) Hi(uid, message string) error {
 		return err
 	}
 	d.redis.Set(context.Background(), "demo", message, time.Minute)
-	// mq publish
+	//nats mq publish
+	natsTopic := common.NatsHeader.CreateTopic("demo")
 	if err := d.mq.Publish(
-		common.NatsHeader.CreateTopic("demo"),
-		miface.WithBytes([]byte(message)),
+		natsTopic,
+		miface.WithBytes([]byte(fmt.Sprintf("nats mq: %s", message))),
 	); err != nil {
 		return err
 	}
+	// local(channel) mq publish
+	localTopic := common.LocalHeader.CreateTopic("demo")
+	if err := d.mq.Publish(
+		localTopic,
+		miface.WithBytes([]byte(fmt.Sprintf("local mq: %s", message))),
+	); err != nil {
+		return err
+	}
+
 	return nil
 }
 
 func (d *Demo) Watch(ctx context.Context, topic string, callback func(message string) error) error {
-	// mq subscribe
-	sub, err := d.mq.Subscribe(
-		common.NatsHeader.CreateTopic(topic),
+	//nats mq subscribe
+	natsTopic := common.NatsHeader.CreateTopic(topic)
+	_, err := d.mq.Subscribe(
+		ctx,
+		natsTopic,
 		func(msg miface.Message, err error) common.ConsumptionCode {
 			if err := callback(string(msg.Data())); err != nil {
 				return common.ConsumeNackPersistentFailure
@@ -78,9 +91,18 @@ func (d *Demo) Watch(ctx context.Context, topic string, callback func(message st
 	if err != nil {
 		return err
 	}
+	//local(channel) mq subscribe
+	localTopic := common.LocalHeader.CreateTopic(topic)
+	_, err = d.mq.Subscribe(
+		ctx,
+		localTopic,
+		func(msg miface.Message, err error) common.ConsumptionCode {
+			if err := callback(string(msg.Data())); err != nil {
+				return common.ConsumeNackPersistentFailure
+			}
+			return common.ConsumeAck
+		})
+
 	<-ctx.Done()
-	if err := sub.Unsubscribe(); err != nil {
-		return err
-	}
 	return nil
 }
