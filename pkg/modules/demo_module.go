@@ -13,7 +13,7 @@ var GrpcModule = fx.Module("grpcService",
 	dfx.SqliteDriverModule,
 	dfx.SettingsModule,
 	dfx.AuthModule,
-	demo.GrpcModule,
+	demo.GrpcService,
 )
 
 // HttpModule  http service module
@@ -22,8 +22,8 @@ var HttpModule = fx.Module("httpService",
 	dfx.SettingsModule,
 	dfx.SqliteDriverModule,
 	dfx.AuthModule,
-	demo.GrpcModule,
-	demo.GatewayModule,
+	demo.GrpcService,
+	demo.HttpService,
 )
 
 // TcpModule  tcp service module
@@ -31,7 +31,7 @@ var HttpModule = fx.Module("httpService",
 var TcpModule = fx.Module("tcpService",
 	dfx.SettingsModule,
 	dfx.SqliteDriverModule,
-	demo.TcpModule,
+	demo.TcpService,
 )
 
 // AllModule  all service module
@@ -40,9 +40,9 @@ var AllModule = fx.Module("allService",
 	dfx.AuthModule,
 	dfx.SettingsModule,
 	dfx.SqliteDriverModule,
-	demo.GrpcModule,
-	demo.GatewayModule,
-	demo.TcpModule,
+	demo.GrpcService,
+	demo.HttpService,
+	demo.TcpService,
 )
 
 // GrpcClientModule  grpc client module

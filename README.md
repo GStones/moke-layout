@@ -16,7 +16,7 @@
    ```
 * build client:
    ```shell
-     go build -o client.exe ./cmd/client/main.go 
+     go build -o client.exe ./cmd/demo/client/main.go 
    ```
 * run client:
     ```shell
