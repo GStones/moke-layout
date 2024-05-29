@@ -23,7 +23,7 @@ type DemoClientResult struct {
 }
 
 func NewDemoClient(host string, logger *zap.Logger, sSetting sfx.SecuritySettingsParams) (pb2.DemoServiceClient, error) {
-	if sSetting.TLSEnable {
+	if sSetting.MTLSEnable {
 		if conn, err := tools.DialWithSecurity(
 			host,
 			sSetting.ClientCert,

@@ -152,7 +152,7 @@ func NewService(
 	return
 }
 
-var GrpcModule = fx.Provide(
+var GrpcService = fx.Provide(
 	func(
 		l *zap.Logger,
 		dProvider ofx.DocumentStoreParams,
@@ -178,7 +178,7 @@ var GrpcModule = fx.Provide(
 	},
 )
 
-var GatewayModule = fx.Provide(
+var HttpService = fx.Provide(
 	func(
 		l *zap.Logger,
 		dProvider ofx.DocumentStoreParams,
@@ -204,7 +204,7 @@ var GatewayModule = fx.Provide(
 	},
 )
 
-var TcpModule = fx.Provide(
+var TcpService = fx.Provide(
 	func(
 		l *zap.Logger,
 		dProvider ofx.DocumentStoreParams,
