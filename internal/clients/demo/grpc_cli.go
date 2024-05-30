@@ -56,14 +56,22 @@ func (p *DemoGrpc) sayHi(c *ishell.Context) {
 	c.ShowPrompt(false)
 	defer c.ShowPrompt(true)
 
-	slogger.Info(c, "Enter say hi message...")
-	msg := slogger.ReadLine(c, "message: ")
-
+	msg := "hello"
+	in := slogger.ReadLine(c, "message(default:hello): ")
+	if in != "" {
+		msg = in
+	}
+	topic := "demo"
+	t := slogger.ReadLine(c, "topic(default:demo): ")
+	if t != "" {
+		topic = t
+	}
 	md := metadata.Pairs("authorization", fmt.Sprintf("%s %v", "bearer", "test"))
 	ctx := mm.MD(md).ToOutgoing(context.Background())
 	if response, err := p.client.Hi(ctx, &pb.HiRequest{
 		Uid:     "10000",
 		Message: msg,
+		Topic:   topic,
 	}); err != nil {
 		slogger.Warn(c, err)
 	} else {
@@ -75,8 +83,11 @@ func (p *DemoGrpc) watch(c *ishell.Context) {
 	c.ShowPrompt(false)
 	defer c.ShowPrompt(true)
 
-	slogger.Info(c, "Enter watch topic...")
-	topic := slogger.ReadLine(c, "topic: ")
+	topic := "demo"
+	t := slogger.ReadLine(c, "topic(default:demo): ")
+	if t != "" {
+		topic = t
+	}
 
 	md := metadata.Pairs("authorization", fmt.Sprintf("%s %v", "bearer", "test"))
 	ctx := mm.MD(md).ToOutgoing(context.Background())

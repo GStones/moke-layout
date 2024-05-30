@@ -26,6 +26,7 @@
      ./client.exe grpc
       # run tcp client
      ./client.exe tcp
+     # run help to see more command options. and follow the tips to run.
     ```
   tips: http client use Postman to connect `localhost:8081`.
 * run load test:

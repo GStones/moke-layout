@@ -55,7 +55,7 @@ func (s *Service) Hi(_ context.Context, request *pb.HiRequest) (*pb.HiResponse, 
 	message := request.GetMessage()
 	s.logger.Info("Hi", zap.String("message", message))
 
-	if err := s.demoHandler.Hi(request.GetUid(), request.GetMessage()); err != nil {
+	if err := s.demoHandler.Hi(request.GetUid(), request.GetTopic(), request.GetMessage()); err != nil {
 		return nil, err
 	}
 	return &pb.HiResponse{
@@ -92,7 +92,7 @@ func (s *Service) Handle(request ziface.IRequest) {
 		if err := proto.Unmarshal(request.GetData(), req); err != nil {
 			s.logger.Error("unmarshal request data error", zap.Error(err))
 		} else {
-			if err := s.demoHandler.Hi(req.GetUid(), req.GetMessage()); err != nil {
+			if err := s.demoHandler.Hi(req.GetUid(), req.GetTopic(), req.GetMessage()); err != nil {
 				s.logger.Error("Hi error", zap.Error(err))
 			}
 		}

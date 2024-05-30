@@ -1,25 +1,45 @@
 package dfx
 
 import (
-	"errors"
-	"strings"
+	"context"
 
+	"github.com/grpc-ecosystem/go-grpc-middleware/v2/interceptors/auth"
+	"github.com/gstones/moke-kit/server/pkg/sfx"
+	"github.com/gstones/moke-kit/utility"
 	"go.uber.org/fx"
 	"go.uber.org/zap"
-
-	"github.com/gstones/moke-kit/server/pkg/sfx"
+	"google.golang.org/grpc"
 )
 
 // Author is a demo auth service
 type Author struct {
+	unAuthMethods map[string]struct{}
 }
 
 // Auth is a demo auth method
-func (d *Author) Auth(token string) (string, error) {
-	if !strings.Contains(token, "test") {
-		return "", errors.New("token error")
+func (d *Author) Auth(ctx context.Context) (context.Context, error) {
+	method, _ := grpc.Method(ctx)
+	if _, ok := d.unAuthMethods[method]; ok {
+		return context.WithValue(ctx, utility.WithOutTag, true), nil
 	}
-	return token, nil
+	token, err := auth.AuthFromMD(ctx, string(utility.TokenContextKey))
+	if err != nil {
+		return ctx, err
+	}
+	// TODO check token with your custom auth middleware
+	//CheckToken(token)
+	_ = token
+	return ctx, nil
+}
+
+//AddUnAuthMethod(method string)
+
+// AddUnAuthMethod add you want to disable auth method here
+func (d *Author) AddUnAuthMethod(method string) {
+	if d.unAuthMethods == nil {
+		d.unAuthMethods = make(map[string]struct{})
+	}
+	d.unAuthMethods[method] = struct{}{}
 }
 
 // AuthModule is a demo auth module
@@ -30,11 +50,15 @@ func (d *Author) Auth(token string) (string, error) {
 //	type service struct {
 //		utility.WithoutAuth
 //	}
+//
+// or disable it for a method, add the method name by `AddUnAuthMethod`
 var AuthModule = fx.Provide(
 	func(
 		l *zap.Logger,
-	) (out sfx.AuthServiceResult, err error) {
-		out.AuthService = &Author{}
+	) (out sfx.AuthMiddlewareResult, err error) {
+		out.AuthMiddleware = &Author{
+			unAuthMethods: make(map[string]struct{}),
+		}
 		return
 	},
 )
