@@ -40,7 +40,7 @@ func NewDemo(
 	}
 }
 
-func (d *Demo) Hi(uid, message string) error {
+func (d *Demo) Hi(uid, topic, message string) error {
 	// nosqlDb create
 	if data, err := d.nosqlDb.LoadOrCreateDemo(uid); err != nil {
 		return err
@@ -55,9 +55,9 @@ func (d *Demo) Hi(uid, message string) error {
 	if err := db_sql.FirstOrCreate(d.gormDb, uid, message); err != nil {
 		return err
 	}
-	d.redis.Set(context.Background(), "demo", message, time.Minute)
+	d.redis.Set(context.Background(), topic, message, time.Minute)
 	//nats mq publish
-	natsTopic := common.NatsHeader.CreateTopic("demo")
+	natsTopic := common.NatsHeader.CreateTopic(topic)
 	if err := d.mq.Publish(
 		natsTopic,
 		miface.WithBytes([]byte(fmt.Sprintf("nats mq: %s", message))),
@@ -65,7 +65,7 @@ func (d *Demo) Hi(uid, message string) error {
 		return err
 	}
 	// local(channel) mq publish
-	localTopic := common.LocalHeader.CreateTopic("demo")
+	localTopic := common.LocalHeader.CreateTopic(topic)
 	if err := d.mq.Publish(
 		localTopic,
 		miface.WithBytes([]byte(fmt.Sprintf("local mq: %s", message))),

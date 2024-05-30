@@ -58,11 +58,20 @@ func (dz *DemoTcp) sayHi(c *ishell.Context) {
 	c.ShowPrompt(false)
 	defer c.ShowPrompt(true)
 
-	slogger.Info(c, "Enter say hi message...")
-	msg := slogger.ReadLine(c, "message: ")
+	msg := "hello"
+	in := slogger.ReadLine(c, "message(default:hello): ")
+	if in != "" {
+		msg = in
+	}
+	topic := "demo"
+	t := slogger.ReadLine(c, "topic(default:demo): ")
+	if t != "" {
+		topic = t
+	}
 
 	req := &pb.HiRequest{
 		Message: msg,
+		Topic:   topic,
 		Uid:     "10000",
 	}
 	data, err := proto.Marshal(req)
