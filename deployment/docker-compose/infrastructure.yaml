@@ -10,18 +10,18 @@ services:
 #    restart: always
 #    networks:
 #      - demo-network
-#  demo-mongodb:
-#    container_name: demo-mongodb
-#    image: mongo:latest
+  demo-mongodb:
+    container_name: demo-mongodb
+    image: mongo:latest
 #    env_file:
 #      - .env
-#    restart: always
-#    volumes:
-#      - mongo-data:/data/db
-#    ports:
-#      - "27017:27017"
-#    networks:
-#      - demo-network
+    restart: always
+    volumes:
+      - mongo-data:/data/db
+    ports:
+      - "27017:27017"
+    networks:
+      - demo-network
   demo-nats:
     container_name: demo-nats
     image: nats:latest
