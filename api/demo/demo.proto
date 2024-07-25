@@ -7,12 +7,14 @@ import "google/api/annotations.proto";
 option go_package = "demo/api;pb";
 
 service DemoService {
+  // Say hi to topic
   rpc Hi(HiRequest) returns (HiResponse) {
     option (google.api.http) = {
       post: "/v1/hello/hi"
       body: "*"
     };
   }
+  // Watch topic message
   rpc Watch(WatchRequest) returns (stream WatchResponse) {
     option (google.api.http) = {get: "/v1/hello/watch"};
   }
