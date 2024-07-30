@@ -1,6 +1,6 @@
 ARG APP_NAME=demo
 # Step 1: Modules caching
-FROM golang:1.20-alpine3.17 as modules
+FROM golang:alpine as modules
 RUN apk add --no-cache ca-certificates git
 COPY go.mod go.sum /modules/
 WORKDIR /modules
@@ -9,7 +9,7 @@ ENV GOPROXY="https://goproxy.cn,https://gocenter.io,direct"
 RUN go mod download
 
 # Step 2: Builder
-FROM golang:1.20-alpine3.17 as builder
+FROM golang:alpine as builder
 ARG APP_NAME
 COPY --from=modules /go/pkg /go/pkg
 COPY . /app

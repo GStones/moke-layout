@@ -1,14 +1,15 @@
 version: '3'
 services:
   demo:
-    env_file:
-      - .env
+    build:
+      context: ../../
+      dockerfile: ./build/package/demo/Dockerfile
     environment:
       - NATS_URL=nats://demo-nats:4222
       - DATABASE_URL=mongodb://demo-mongodb:27017
       - CACHE_URL=redis://demo-redis:6379
-    container_name: bff
-    image: ${REGISTRY}/demo:latest
+    container_name: demo
+#    image: ${REGISTRY}/demo:latest
     labels:
       - "com.centurylinklabs.watchtower.enable=true"
     ports:
