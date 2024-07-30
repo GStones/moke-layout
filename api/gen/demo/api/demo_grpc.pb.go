@@ -27,7 +27,9 @@ const (
 //
 // For semantics around ctx use and closing/ending streaming RPCs, please refer to https://pkg.go.dev/google.golang.org/grpc/?tab=doc#ClientConn.NewStream.
 type DemoServiceClient interface {
+	// Say hi to topic
 	Hi(ctx context.Context, in *HiRequest, opts ...grpc.CallOption) (*HiResponse, error)
+	// Watch topic message
 	Watch(ctx context.Context, in *WatchRequest, opts ...grpc.CallOption) (DemoService_WatchClient, error)
 }
 
@@ -86,7 +88,9 @@ func (x *demoServiceWatchClient) Recv() (*WatchResponse, error) {
 // All implementations should embed UnimplementedDemoServiceServer
 // for forward compatibility
 type DemoServiceServer interface {
+	// Say hi to topic
 	Hi(context.Context, *HiRequest) (*HiResponse, error)
+	// Watch topic message
 	Watch(*WatchRequest, DemoService_WatchServer) error
 }
 
