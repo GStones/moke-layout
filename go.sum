@@ -81,6 +81,7 @@ github.com/grpc-ecosystem/grpc-gateway/v2 v2.20.0 h1:bkypFPDjIYGfCYD5mRBvpqxfYX1
 github.com/grpc-ecosystem/grpc-gateway/v2 v2.20.0/go.mod h1:P+Lt/0by1T8bfcF3z737NnSbmxQAppXMRziHUxPOC8k=
 github.com/gstones/moke-kit v1.0.3 h1:7PQsCboguDi/pZ+mkILVR0ieKFuJlcelAqdjNnrk37o=
 github.com/gstones/moke-kit v1.0.3/go.mod h1:/GK0OwhdFu2weRm75VLIEJ/nIJh1yaXF11c4IJ94cc8=
+github.com/gstones/moke-kit v1.0.4/go.mod h1:nBljFjwfVWobCMVhrkzwC/bJ+MjKKxeq1f7gp8SM288=
 github.com/gstones/zinx v1.2.7-0.20240617071724-88bd884d8d08 h1:YjrnGjuIRVs2t0MjMs4DFQox9GH/4jlOELMRVD5d+xg=
 github.com/gstones/zinx v1.2.7-0.20240617071724-88bd884d8d08/go.mod h1:tgm/iZBMyKKZj4totfeu4+PMzSLb4JH8pnGdcG3ql+8=
 github.com/hashicorp/errwrap v1.0.0/go.mod h1:YH+1FKiLXxHSkmPseP+kNlulaMuP3n2brvKWEqk/Jc4=

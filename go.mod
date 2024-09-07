@@ -6,7 +6,7 @@ require (
 	github.com/abiosoft/ishell v2.0.0+incompatible
 	github.com/grpc-ecosystem/go-grpc-middleware/v2 v2.1.0
 	github.com/grpc-ecosystem/grpc-gateway/v2 v2.20.0
-	github.com/gstones/moke-kit v1.0.3
+	github.com/gstones/moke-kit v1.0.4
 	github.com/gstones/zinx v1.2.7-0.20240617071724-88bd884d8d08
 	github.com/redis/go-redis/v9 v9.5.3
 	github.com/spf13/cobra v1.8.0
