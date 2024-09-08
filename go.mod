@@ -6,7 +6,7 @@ require (
 	github.com/abiosoft/ishell v2.0.0+incompatible
 	github.com/grpc-ecosystem/go-grpc-middleware/v2 v2.1.0
 	github.com/grpc-ecosystem/grpc-gateway/v2 v2.20.0
-	github.com/gstones/moke-kit v1.0.3
+	github.com/gstones/moke-kit v1.0.4
 	github.com/gstones/zinx v1.2.7-0.20240617071724-88bd884d8d08
 	github.com/redis/go-redis/v9 v9.5.3
 	github.com/spf13/cobra v1.8.0
@@ -20,8 +20,8 @@ require (
 )
 
 require (
-	cloud.google.com/go/compute/metadata v0.5.0 // indirect
 	github.com/ThreeDotsLabs/watermill v1.3.5 // indirect
+	github.com/ThreeDotsLabs/watermill-nats/v2 v2.0.2 // indirect
 	github.com/abiosoft/readline v0.0.0-20180607040430-155bce2042db // indirect
 	github.com/cenkalti/backoff/v3 v3.2.2 // indirect
 	github.com/cenkalti/backoff/v4 v4.3.0 // indirect
