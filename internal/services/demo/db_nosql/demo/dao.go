@@ -1,6 +1,8 @@
 package demo
 
 import (
+	"context"
+
 	"github.com/gstones/moke-kit/orm/nosql"
 	"github.com/gstones/moke-kit/orm/nosql/diface"
 )
@@ -11,14 +13,14 @@ type Dao struct {
 	Data               *Data  `bson:"data"`
 }
 
-func (dm *Dao) Init(id string, doc diface.ICollection) error {
+func (dm *Dao) Init(ctx context.Context, id string, doc diface.ICollection) error {
 	key, e := NewDemoKey(id)
 	if e != nil {
 		return e
 	}
 
 	dm.Data = &Data{}
-	dm.DocumentBase.Init(&dm.Data, dm.clear, doc, key)
+	dm.DocumentBase.Init(ctx, &dm.Data, dm.clear, doc, key)
 	return nil
 }
 
@@ -35,9 +37,9 @@ func (dm *Dao) InitDefault() error {
 	return nil
 }
 
-func NewDemoModel(id string, doc diface.ICollection) (*Dao, error) {
+func NewDemoModel(ctx context.Context, id string, doc diface.ICollection) (*Dao, error) {
 	dm := &Dao{}
-	if err := dm.Init(id, doc); err != nil {
+	if err := dm.Init(ctx, id, doc); err != nil {
 		return nil, err
 	}
 	return dm, nil
