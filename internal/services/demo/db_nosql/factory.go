@@ -1,13 +1,13 @@
 package db_nosql
 
 import (
+	"context"
 	"errors"
 
 	"go.uber.org/zap"
 
 	"github.com/gstones/moke-kit/orm/nerrors"
 	"github.com/gstones/moke-kit/orm/nosql/diface"
-
 	"github.com/gstones/moke-layout/internal/services/demo/db_nosql/demo"
 )
 
@@ -23,11 +23,11 @@ func OpenDatabase(l *zap.Logger, coll diface.ICollection) Database {
 	}
 }
 
-func (db *Database) LoadOrCreateDemo(id string) (*demo.Dao, error) {
-	if dm, err := demo.NewDemoModel(id, db.coll); err != nil {
+func (db *Database) LoadOrCreateDemo(ctx context.Context, id string) (*demo.Dao, error) {
+	if dm, err := demo.NewDemoModel(ctx, id, db.coll); err != nil {
 		return nil, err
 	} else if err = dm.Load(); errors.Is(err, nerrors.ErrNotFound) {
-		if dm, err = demo.NewDemoModel(id, db.coll); err != nil {
+		if dm, err = demo.NewDemoModel(ctx, id, db.coll); err != nil {
 			return nil, err
 		} else if err := dm.InitDefault(); err != nil {
 			return nil, err

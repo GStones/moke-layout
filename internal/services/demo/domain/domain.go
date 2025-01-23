@@ -11,7 +11,6 @@ import (
 
 	"github.com/gstones/moke-kit/mq/common"
 	"github.com/gstones/moke-kit/mq/miface"
-
 	"github.com/gstones/moke-layout/internal/services/demo/db_nosql"
 	"github.com/gstones/moke-layout/internal/services/demo/db_sql"
 )
@@ -40,69 +39,63 @@ func NewDemo(
 	}
 }
 
-func (d *Demo) Hi(uid, topic, message string) error {
-	// nosqlDb create
-	if data, err := d.nosqlDb.LoadOrCreateDemo(uid); err != nil {
-		return err
-	} else {
-		if err := data.Update(func() bool {
-			data.SetMessage(message)
-			return true
-		}); err != nil {
-			return err
-		}
+func (d *Demo) Hi(ctx context.Context, uid, topic, message string) error {
+	// Handle nosqlDb operation
+	data, err := d.nosqlDb.LoadOrCreateDemo(ctx, uid)
+	if err != nil {
+		return fmt.Errorf("failed to load/create demo: %w", err)
 	}
+
+	if err := data.Update(func() bool {
+		data.SetMessage(message)
+		return true
+	}); err != nil {
+		return fmt.Errorf("failed to update demo: %w", err)
+	}
+
+	// Handle SQL operation
 	if err := db_sql.FirstOrCreate(d.gormDb, uid, message); err != nil {
-		return err
+		return fmt.Errorf("failed to create SQL record: %w", err)
 	}
-	d.redis.Set(context.Background(), topic, message, time.Minute)
-	//nats mq publish
-	natsTopic := common.NatsHeader.CreateTopic(topic)
-	if err := d.mq.Publish(
-		natsTopic,
-		miface.WithBytes([]byte(fmt.Sprintf("nats mq: %s", message))),
-	); err != nil {
-		return err
+
+	// Handle Redis operation
+	if err := d.redis.Set(ctx, topic, message, time.Minute).Err(); err != nil {
+		return fmt.Errorf("failed to set redis key: %w", err)
 	}
-	// local(channel) mq publish
-	localTopic := common.LocalHeader.CreateTopic(topic)
-	if err := d.mq.Publish(
-		localTopic,
-		miface.WithBytes([]byte(fmt.Sprintf("local mq: %s", message))),
-	); err != nil {
-		return err
+
+	// Publish to message queues
+	for _, header := range []common.Header{common.NatsHeader, common.LocalHeader} {
+		mqTopic := header.CreateTopic(topic)
+		prefix := "nats"
+		if header == common.LocalHeader {
+			prefix = "local"
+		}
+		if err := d.mq.Publish(
+			mqTopic,
+			miface.WithBytes([]byte(fmt.Sprintf("%s mq: %s", prefix, message))),
+		); err != nil {
+			return fmt.Errorf("failed to publish to %s queue: %w", prefix, err)
+		}
 	}
 
 	return nil
 }
 
 func (d *Demo) Watch(ctx context.Context, topic string, callback func(message string) error) error {
-	//nats mq subscribe
-	natsTopic := common.NatsHeader.CreateTopic(topic)
-	if _, err := d.mq.Subscribe(
-		ctx,
-		natsTopic,
-		func(msg miface.Message, err error) common.ConsumptionCode {
-			if err := callback(string(msg.Data())); err != nil {
-				return common.ConsumeNackPersistentFailure
-			}
-			return common.ConsumeAck
-		}); err != nil {
-		return err
-	}
-
-	//local(channel) mq subscribe
-	localTopic := common.LocalHeader.CreateTopic(topic)
-	if _, err := d.mq.Subscribe(
-		ctx,
-		localTopic,
-		func(msg miface.Message, err error) common.ConsumptionCode {
-			if err := callback(string(msg.Data())); err != nil {
-				return common.ConsumeNackPersistentFailure
-			}
-			return common.ConsumeAck
-		}); err != nil {
-		return err
+	// Subscribe to both queues
+	for _, header := range []common.Header{common.NatsHeader, common.LocalHeader} {
+		mqTopic := header.CreateTopic(topic)
+		if _, err := d.mq.Subscribe(
+			ctx,
+			mqTopic,
+			func(msg miface.Message, err error) common.ConsumptionCode {
+				if err := callback(string(msg.Data())); err != nil {
+					return common.ConsumeNackPersistentFailure
+				}
+				return common.ConsumeAck
+			}); err != nil {
+			return fmt.Errorf("failed to subscribe to topic %s: %w", mqTopic, err)
+		}
 	}
 
 	<-ctx.Done()

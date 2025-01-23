@@ -2,6 +2,7 @@ package demo
 
 import (
 	"context"
+	"fmt"
 
 	"github.com/gstones/zinx/ziface"
 	"github.com/redis/go-redis/v9"
@@ -32,37 +33,27 @@ type Service struct {
 
 func (s *Service) Watch(request *pb.WatchRequest, server pb.DemoService_WatchServer) error {
 	topic := request.GetTopic()
-	s.logger.Info("Watch", zap.String("topic", topic))
+	s.logger.Info("Watch request received", zap.String("topic", topic))
 
-	if err := s.demoHandler.Watch(
-		server.Context(),
-		topic,
-		func(message string) error {
-			if err := server.Send(&pb.WatchResponse{
-				Message: message,
-			}); err != nil {
-				return err
-			}
-			return nil
-		}); err != nil {
-		return err
-	}
-
-	return nil
+	return s.demoHandler.Watch(server.Context(), topic, func(message string) error {
+		return server.Send(&pb.WatchResponse{Message: message})
+	})
 }
 
-func (s *Service) Hi(_ context.Context, request *pb.HiRequest) (*pb.HiResponse, error) {
-	message := request.GetMessage()
-	s.logger.Info("Hi", zap.String("message", message))
+func (s *Service) Hi(ctx context.Context, request *pb.HiRequest) (*pb.HiResponse, error) {
+	s.logger.Info("Hi request received",
+		zap.String("uid", request.GetUid()),
+		zap.String("topic", request.GetTopic()),
+		zap.String("message", request.GetMessage()))
 
-	if err := s.demoHandler.Hi(request.GetUid(), request.GetTopic(), request.GetMessage()); err != nil {
+	if err := s.demoHandler.Hi(ctx, request.GetUid(), request.GetTopic(), request.GetMessage()); err != nil {
+		s.logger.Error("Hi handler failed", zap.Error(err))
 		return nil, err
 	}
-	return &pb.HiResponse{
-		Message: "response:  " + message,
-	}, nil
 
+	return &pb.HiResponse{Message: "response: " + request.GetMessage()}, nil
 }
+
 func (s *Service) RegisterWithGrpcServer(server siface.IGrpcServer) error {
 	pb.RegisterDemoServiceServer(server.GrpcServer(), s)
 	return nil
@@ -88,36 +79,48 @@ func (s *Service) PreHandle(_ ziface.IRequest) {
 func (s *Service) Handle(request ziface.IRequest) {
 	switch request.GetMsgID() {
 	case 1:
-		req := &pb.HiRequest{}
-		if err := proto.Unmarshal(request.GetData(), req); err != nil {
-			s.logger.Error("unmarshal request data error", zap.Error(err))
-		} else {
-			if err := s.demoHandler.Hi(req.GetUid(), req.GetTopic(), req.GetMessage()); err != nil {
-				s.logger.Error("Hi error", zap.Error(err))
-			}
-		}
+		s.handleHiRequest(request)
 	case 2:
-		req := &pb.WatchRequest{}
-		if err := proto.Unmarshal(request.GetData(), req); err != nil {
-			s.logger.Error("unmarshal request data error", zap.Error(err))
-		} else {
-			if err := s.demoHandler.Watch(
-				request.GetConnection().Context(),
-				req.GetTopic(),
-				func(message string) error {
-					resp := &pb.WatchResponse{
-						Message: message,
-					}
-					if data, err := proto.Marshal(resp); err != nil {
-						return err
-					} else if err := request.GetConnection().SendMsg(2, data); err != nil {
-						return err
-					}
-					return nil
-				}); err != nil {
-				s.logger.Error("Watch error", zap.Error(err))
+		s.handleWatchRequest(request)
+	}
+}
+
+func (s *Service) handleHiRequest(request ziface.IRequest) {
+	req := &pb.HiRequest{}
+	if err := proto.Unmarshal(request.GetData(), req); err != nil {
+		s.logger.Error("Failed to unmarshal Hi request", zap.Error(err))
+		return
+	}
+
+	if err := s.demoHandler.Hi(request.GetConnection().Context(),
+		req.GetUid(), req.GetTopic(), req.GetMessage()); err != nil {
+		s.logger.Error("Hi handler failed", zap.Error(err))
+	}
+}
+
+func (s *Service) handleWatchRequest(request ziface.IRequest) {
+	req := &pb.WatchRequest{}
+	if err := proto.Unmarshal(request.GetData(), req); err != nil {
+		s.logger.Error("Failed to unmarshal Watch request", zap.Error(err))
+		return
+	}
+
+	err := s.demoHandler.Watch(request.GetConnection().Context(), req.GetTopic(),
+		func(message string) error {
+			resp := &pb.WatchResponse{Message: message}
+			data, err := proto.Marshal(resp)
+			if err != nil {
+				return fmt.Errorf("failed to marshal response: %w", err)
 			}
-		}
+
+			if err := request.GetConnection().SendMsg(2, data); err != nil {
+				return fmt.Errorf("failed to send message: %w", err)
+			}
+			return nil
+		})
+
+	if err != nil {
+		s.logger.Error("Watch handler failed", zap.Error(err))
 	}
 }
 
