@@ -18,6 +18,7 @@
   "paths": {
     "/v1/hello/hi": {
       "post": {
+        "summary": "Say hi to topic",
         "operationId": "DemoService_Hi",
         "responses": {
           "200": {
@@ -50,6 +51,7 @@
     },
     "/v1/hello/watch": {
       "get": {
+        "summary": "Watch topic message",
         "operationId": "DemoService_Watch",
         "responses": {
           "200": {
