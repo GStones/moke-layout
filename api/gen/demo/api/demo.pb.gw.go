@@ -10,6 +10,7 @@ package pb
 
 import (
 	"context"
+	"errors"
 	"io"
 	"net/http"
 
@@ -24,54 +25,53 @@ import (
 )
 
 // Suppress "imported and not used" errors
-var _ codes.Code
-var _ io.Reader
-var _ status.Status
-var _ = runtime.String
-var _ = utilities.NewDoubleArray
-var _ = metadata.Join
+var (
+	_ codes.Code
+	_ io.Reader
+	_ status.Status
+	_ = errors.New
+	_ = runtime.String
+	_ = utilities.NewDoubleArray
+	_ = metadata.Join
+)
 
 func request_DemoService_Hi_0(ctx context.Context, marshaler runtime.Marshaler, client DemoServiceClient, req *http.Request, pathParams map[string]string) (proto.Message, runtime.ServerMetadata, error) {
-	var protoReq HiRequest
-	var metadata runtime.ServerMetadata
-
-	if err := marshaler.NewDecoder(req.Body).Decode(&protoReq); err != nil && err != io.EOF {
+	var (
+		protoReq HiRequest
+		metadata runtime.ServerMetadata
+	)
+	if err := marshaler.NewDecoder(req.Body).Decode(&protoReq); err != nil && !errors.Is(err, io.EOF) {
 		return nil, metadata, status.Errorf(codes.InvalidArgument, "%v", err)
 	}
-
 	msg, err := client.Hi(ctx, &protoReq, grpc.Header(&metadata.HeaderMD), grpc.Trailer(&metadata.TrailerMD))
 	return msg, metadata, err
-
 }
 
 func local_request_DemoService_Hi_0(ctx context.Context, marshaler runtime.Marshaler, server DemoServiceServer, req *http.Request, pathParams map[string]string) (proto.Message, runtime.ServerMetadata, error) {
-	var protoReq HiRequest
-	var metadata runtime.ServerMetadata
-
-	if err := marshaler.NewDecoder(req.Body).Decode(&protoReq); err != nil && err != io.EOF {
+	var (
+		protoReq HiRequest
+		metadata runtime.ServerMetadata
+	)
+	if err := marshaler.NewDecoder(req.Body).Decode(&protoReq); err != nil && !errors.Is(err, io.EOF) {
 		return nil, metadata, status.Errorf(codes.InvalidArgument, "%v", err)
 	}
-
 	msg, err := server.Hi(ctx, &protoReq)
 	return msg, metadata, err
-
 }
 
-var (
-	filter_DemoService_Watch_0 = &utilities.DoubleArray{Encoding: map[string]int{}, Base: []int(nil), Check: []int(nil)}
-)
+var filter_DemoService_Watch_0 = &utilities.DoubleArray{Encoding: map[string]int{}, Base: []int(nil), Check: []int(nil)}
 
 func request_DemoService_Watch_0(ctx context.Context, marshaler runtime.Marshaler, client DemoServiceClient, req *http.Request, pathParams map[string]string) (DemoService_WatchClient, runtime.ServerMetadata, error) {
-	var protoReq WatchRequest
-	var metadata runtime.ServerMetadata
-
+	var (
+		protoReq WatchRequest
+		metadata runtime.ServerMetadata
+	)
 	if err := req.ParseForm(); err != nil {
 		return nil, metadata, status.Errorf(codes.InvalidArgument, "%v", err)
 	}
 	if err := runtime.PopulateQueryParameters(&protoReq, req.Form, filter_DemoService_Watch_0); err != nil {
 		return nil, metadata, status.Errorf(codes.InvalidArgument, "%v", err)
 	}
-
 	stream, err := client.Watch(ctx, &protoReq)
 	if err != nil {
 		return nil, metadata, err
@@ -82,24 +82,21 @@ func request_DemoService_Watch_0(ctx context.Context, marshaler runtime.Marshale
 	}
 	metadata.HeaderMD = header
 	return stream, metadata, nil
-
 }
 
 // RegisterDemoServiceHandlerServer registers the http handlers for service DemoService to "mux".
 // UnaryRPC     :call DemoServiceServer directly.
 // StreamingRPC :currently unsupported pending https://github.com/grpc/grpc-go/issues/906.
 // Note that using this registration option will cause many gRPC library features to stop working. Consider using RegisterDemoServiceHandlerFromEndpoint instead.
+// GRPC interceptors will not work for this type of registration. To use interceptors, you must use the "runtime.WithMiddlewares" option in the "runtime.NewServeMux" call.
 func RegisterDemoServiceHandlerServer(ctx context.Context, mux *runtime.ServeMux, server DemoServiceServer) error {
-
-	mux.Handle("POST", pattern_DemoService_Hi_0, func(w http.ResponseWriter, req *http.Request, pathParams map[string]string) {
+	mux.Handle(http.MethodPost, pattern_DemoService_Hi_0, func(w http.ResponseWriter, req *http.Request, pathParams map[string]string) {
 		ctx, cancel := context.WithCancel(req.Context())
 		defer cancel()
 		var stream runtime.ServerTransportStream
 		ctx = grpc.NewContextWithServerTransportStream(ctx, &stream)
 		inboundMarshaler, outboundMarshaler := runtime.MarshalerForRequest(mux, req)
-		var err error
-		var annotatedContext context.Context
-		annotatedContext, err = runtime.AnnotateIncomingContext(ctx, mux, req, "/demo.pb.DemoService/Hi", runtime.WithHTTPPathPattern("/v1/hello/hi"))
+		annotatedContext, err := runtime.AnnotateIncomingContext(ctx, mux, req, "/demo.pb.DemoService/Hi", runtime.WithHTTPPathPattern("/v1/hello/hi"))
 		if err != nil {
 			runtime.HTTPError(ctx, mux, outboundMarshaler, w, req, err)
 			return
@@ -111,12 +108,10 @@ func RegisterDemoServiceHandlerServer(ctx context.Context, mux *runtime.ServeMux
 			runtime.HTTPError(annotatedContext, mux, outboundMarshaler, w, req, err)
 			return
 		}
-
 		forward_DemoService_Hi_0(annotatedContext, mux, outboundMarshaler, w, req, resp, mux.GetForwardResponseOptions()...)
-
 	})
 
-	mux.Handle("GET", pattern_DemoService_Watch_0, func(w http.ResponseWriter, req *http.Request, pathParams map[string]string) {
+	mux.Handle(http.MethodGet, pattern_DemoService_Watch_0, func(w http.ResponseWriter, req *http.Request, pathParams map[string]string) {
 		err := status.Error(codes.Unimplemented, "streaming calls are not yet supported in the in-process transport")
 		_, outboundMarshaler := runtime.MarshalerForRequest(mux, req)
 		runtime.HTTPError(ctx, mux, outboundMarshaler, w, req, err)
@@ -147,7 +142,6 @@ func RegisterDemoServiceHandlerFromEndpoint(ctx context.Context, mux *runtime.Se
 			}
 		}()
 	}()
-
 	return RegisterDemoServiceHandler(ctx, mux, conn)
 }
 
@@ -161,16 +155,13 @@ func RegisterDemoServiceHandler(ctx context.Context, mux *runtime.ServeMux, conn
 // to "mux". The handlers forward requests to the grpc endpoint over the given implementation of "DemoServiceClient".
 // Note: the gRPC framework executes interceptors within the gRPC handler. If the passed in "DemoServiceClient"
 // doesn't go through the normal gRPC flow (creating a gRPC client etc.) then it will be up to the passed in
-// "DemoServiceClient" to call the correct interceptors.
+// "DemoServiceClient" to call the correct interceptors. This client ignores the HTTP middlewares.
 func RegisterDemoServiceHandlerClient(ctx context.Context, mux *runtime.ServeMux, client DemoServiceClient) error {
-
-	mux.Handle("POST", pattern_DemoService_Hi_0, func(w http.ResponseWriter, req *http.Request, pathParams map[string]string) {
+	mux.Handle(http.MethodPost, pattern_DemoService_Hi_0, func(w http.ResponseWriter, req *http.Request, pathParams map[string]string) {
 		ctx, cancel := context.WithCancel(req.Context())
 		defer cancel()
 		inboundMarshaler, outboundMarshaler := runtime.MarshalerForRequest(mux, req)
-		var err error
-		var annotatedContext context.Context
-		annotatedContext, err = runtime.AnnotateContext(ctx, mux, req, "/demo.pb.DemoService/Hi", runtime.WithHTTPPathPattern("/v1/hello/hi"))
+		annotatedContext, err := runtime.AnnotateContext(ctx, mux, req, "/demo.pb.DemoService/Hi", runtime.WithHTTPPathPattern("/v1/hello/hi"))
 		if err != nil {
 			runtime.HTTPError(ctx, mux, outboundMarshaler, w, req, err)
 			return
@@ -181,18 +172,13 @@ func RegisterDemoServiceHandlerClient(ctx context.Context, mux *runtime.ServeMux
 			runtime.HTTPError(annotatedContext, mux, outboundMarshaler, w, req, err)
 			return
 		}
-
 		forward_DemoService_Hi_0(annotatedContext, mux, outboundMarshaler, w, req, resp, mux.GetForwardResponseOptions()...)
-
 	})
-
-	mux.Handle("GET", pattern_DemoService_Watch_0, func(w http.ResponseWriter, req *http.Request, pathParams map[string]string) {
+	mux.Handle(http.MethodGet, pattern_DemoService_Watch_0, func(w http.ResponseWriter, req *http.Request, pathParams map[string]string) {
 		ctx, cancel := context.WithCancel(req.Context())
 		defer cancel()
 		inboundMarshaler, outboundMarshaler := runtime.MarshalerForRequest(mux, req)
-		var err error
-		var annotatedContext context.Context
-		annotatedContext, err = runtime.AnnotateContext(ctx, mux, req, "/demo.pb.DemoService/Watch", runtime.WithHTTPPathPattern("/v1/hello/watch"))
+		annotatedContext, err := runtime.AnnotateContext(ctx, mux, req, "/demo.pb.DemoService/Watch", runtime.WithHTTPPathPattern("/v1/hello/watch"))
 		if err != nil {
 			runtime.HTTPError(ctx, mux, outboundMarshaler, w, req, err)
 			return
@@ -203,22 +189,17 @@ func RegisterDemoServiceHandlerClient(ctx context.Context, mux *runtime.ServeMux
 			runtime.HTTPError(annotatedContext, mux, outboundMarshaler, w, req, err)
 			return
 		}
-
 		forward_DemoService_Watch_0(annotatedContext, mux, outboundMarshaler, w, req, func() (proto.Message, error) { return resp.Recv() }, mux.GetForwardResponseOptions()...)
-
 	})
-
 	return nil
 }
 
 var (
-	pattern_DemoService_Hi_0 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 2, 1, 2, 2}, []string{"v1", "hello", "hi"}, ""))
-
+	pattern_DemoService_Hi_0    = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 2, 1, 2, 2}, []string{"v1", "hello", "hi"}, ""))
 	pattern_DemoService_Watch_0 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 2, 1, 2, 2}, []string{"v1", "hello", "watch"}, ""))
 )
 
 var (
-	forward_DemoService_Hi_0 = runtime.ForwardResponseMessage
-
+	forward_DemoService_Hi_0    = runtime.ForwardResponseMessage
 	forward_DemoService_Watch_0 = runtime.ForwardResponseStream
 )
